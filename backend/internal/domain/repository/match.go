@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"football-tables/Backend/internal/domain/entity"
+	"github.com/vasyukov1/football-tables/backend/internal/domain/entity"
 )
 
 type MatchRepository interface {
