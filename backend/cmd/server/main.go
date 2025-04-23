@@ -41,12 +41,12 @@ func main() {
 
     // Автомиграции
     if err := db.AutoMigrate(
-		&model.Team{},
-		&model.Group{},
-		&model.Playoff{},
-		&model.Stage{},   // сначала stages
-		&model.Match{},   // потом matches
-		&model.Table{},
+        &model.Team{},
+        &model.Group{},
+        &model.Playoff{},
+        &model.Stage{}, // сначала stages
+        &model.Match{}, // потом matches
+        &model.Table{},
     ); err != nil {
         log.Fatalf("Migration failed: %v", err)
     }
