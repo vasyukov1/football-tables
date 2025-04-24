@@ -21,5 +21,13 @@
 go.work
 go.work.sum
 
+# OS
+.DS_Store
+
+# Idea files
+.idea/
+**/.idea/
+
 # env file
 .env
+
