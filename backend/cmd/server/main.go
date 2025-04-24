@@ -1,62 +1,84 @@
 package main
 
 import (
-    "fmt"
-    "log"
-    "os"
-
-    "github.com/gin-gonic/gin"
-    "github.com/joho/godotenv"
-    "gorm.io/driver/postgres"
-    "gorm.io/gorm"
-
-    "github.com/leonidlivshits/football-tables/Backend/internal/repository/postgres/model"
+	"fmt"
+	"github.com/joho/godotenv"
+	"github.com/vasyukov1/football-tables/backend/internal/config"
+	"github.com/vasyukov1/football-tables/backend/internal/delivery/http/handler"
+	"github.com/vasyukov1/football-tables/backend/internal/delivery/http/routes"
+	"github.com/vasyukov1/football-tables/backend/internal/infrastructure/repository/postgres_repo"
+	"github.com/vasyukov1/football-tables/backend/internal/infrastructure/repository/postgres_repo/model"
+	"github.com/vasyukov1/football-tables/backend/internal/usecase"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"log"
 )
 
 func main() {
-    // Попытка загрузить .env (если файла нет — просто логируем предупреждение)
-    if err := godotenv.Load(); err != nil {
-        log.Println("⚠️  .env not found, using environment variables")
-    }
+	// Загрузка .env
+	if err := godotenv.Load(); err != nil {
+		log.Println("⚠️  .env not found, using environment variables")
+	}
 
-    // Собираем DSN из переменных окружения
-    dsn := fmt.Sprintf(
-        "host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-        os.Getenv("DB_HOST"),
-        os.Getenv("DB_PORT"),
-        os.Getenv("DB_USER"),
-        os.Getenv("DB_PASSWORD"),
-        os.Getenv("DB_NAME"),
-    )
-    log.Printf("Connecting to %s:%s as %s/%s",
-        os.Getenv("DB_HOST"), os.Getenv("DB_PORT"),
-        os.Getenv("DB_USER"), os.Getenv("DB_NAME"),
-    )
+	// Загрузка конфига
+	cfg := config.Load()
 
-    // Открываем GORM
-    db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-    if err != nil {
-        log.Fatalf("Failed to connect to database: %v", err)
-    }
+	// Инициализация БД
+	db := initDB(cfg)
 
-    // Автомиграции
-    if err := db.AutoMigrate(
-        &model.Team{},
-        &model.Group{},
-        &model.Playoff{},
-        &model.Stage{}, // сначала stages
-        &model.Match{}, // потом matches
-        &model.Table{},
-    ); err != nil {
-        log.Fatalf("Migration failed: %v", err)
-    }
-    log.Println("✅ Миграции выполнены успешно")
+	// Инициализация репозиториев
+	matchRepo := postgres_repo.NewMatchRepository(db)
 
-    // Запуск сервера
-    router := gin.Default()
-    router.GET("/health", func(c *gin.Context) {
-        c.JSON(200, gin.H{"status": "ok", "db": "connected"})
-    })
-    log.Println("🚀 Сервер запущен на порту :8080")
-    router.Run(":8080")
+	// Инициализация usecase
+	matchUC := usecase.NewMatchUsecase(matchRepo)
+
+	// Middleware
+	//authMiddleware := middleware.NewAuthMiddleware(cfg.JWT.Secret)
+
+	// Handlers
+	matchHandler := handler.NewMatchHandler(matchUC)
+
+	// Роутер
+	router := routes.SetupAPIRouter(
+		matchHandler,
+		cfg,
+	)
+
+	// Запуск сервера
+	log.Printf("🚀 Сервер запущен на порту %s", cfg.HTTP.Port)
+	_ = router.Run(":" + cfg.HTTP.Port)
+}
+
+func initDB(cfg *config.Config) *gorm.DB {
+	dsn := buildDSN(cfg)
+	log.Println("DSN:", dsn)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+
+	// Автомиграции (временное решение)
+	if err := db.AutoMigrate(
+		&model.Team{},
+		&model.Group{},
+		&model.Playoff{},
+		&model.Stage{},
+		&model.Match{},
+		&model.Table{},
+	); err != nil {
+		log.Fatalf("Migration failed: %v", err)
+	}
+	return db
+}
+
+func buildDSN(cfg *config.Config) string {
+	return fmt.Sprintf(
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		cfg.DB.Host,
+		cfg.DB.Port,
+		cfg.DB.User,
+		cfg.DB.Password,
+		cfg.DB.Name,
+	)
 }
