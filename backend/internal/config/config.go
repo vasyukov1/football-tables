@@ -20,6 +20,7 @@ type Config struct {
 		AllowedOrigins []string
 		Debug          bool
 	}
+	Env string
 }
 
 func Load() *Config {
@@ -28,6 +29,7 @@ func Load() *Config {
 
 	v.SetDefault("HTTP_PORT", "8080")
 	v.SetDefault("DB_PORT", "5432")
+	v.SetDefault("ENV", "development")
 
 	return &Config{
 		DB: struct {
@@ -60,5 +62,6 @@ func Load() *Config {
 			AllowedOrigins: v.GetStringSlice("CORS_ALLOWED_ORIGINS"),
 			Debug:          v.GetBool("CORS_DEBUG"),
 		},
+		Env: v.GetString("ENV"),
 	}
 }

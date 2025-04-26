@@ -1,0 +1,176 @@
+basePath: /
+definitions:
+  entity.Match:
+    properties:
+      groupID:
+        type: integer
+      id:
+        type: integer
+      isCompleted:
+        type: boolean
+      playoffID:
+        type: integer
+      score1:
+        type: integer
+      score2:
+        type: integer
+      stage:
+        type: string
+      team1ID:
+        type: integer
+      team2ID:
+        type: integer
+    type: object
+  entity.Team:
+    properties:
+      created_at:
+        type: string
+      id:
+        example: 1
+        type: integer
+      name:
+        example: Barcelona
+        type: string
+    type: object
+  request.CreateMatchRequest:
+    properties:
+      group_id:
+        type: integer
+      playoff_id:
+        type: integer
+      stage:
+        enum:
+        - group
+        - playoff
+        type: string
+      team1_id:
+        minimum: 1
+        type: integer
+      team2_id:
+        minimum: 1
+        type: integer
+    required:
+    - stage
+    - team1_id
+    - team2_id
+    type: object
+  request.CreateTeamRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  response.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for managing football tournaments
+  title: Football Tables API
+  version: "1.0"
+paths:
+  /matches:
+    get:
+      consumes:
+      - application/json
+      description: Get list of all matches
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Match'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Get all matches
+      tags:
+      - matches
+    post:
+      consumes:
+      - application/json
+      description: Create new match
+      parameters:
+      - description: Match data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateMatchRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Match'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Create match
+      tags:
+      - matches
+  /teams:
+    get:
+      consumes:
+      - application/json
+      description: Get list of all teams
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Team'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Get all teams
+      tags:
+      - teams
+    post:
+      consumes:
+      - application/json
+      description: Create new team
+      parameters:
+      - description: Team data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateTeamRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Team'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: Create new team
+      tags:
+      - teams
+swagger: "2.0"
