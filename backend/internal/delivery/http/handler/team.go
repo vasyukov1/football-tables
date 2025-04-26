@@ -23,7 +23,7 @@ func NewTeamHandler(tu *usecase.TeamUsecase) *TeamHandler {
 // @Accept json
 // @Produce json
 // @Param input body request.CreateTeamRequest true "Team data"
-// Example: {"name": "Real Madrid"}
+// Example: {"name": "Barcelona"}
 // @Success 201 {object} entity.Team
 // @Failure 400 {object} response.ErrorResponse
 // @Failure 409 {object} response.ErrorResponse

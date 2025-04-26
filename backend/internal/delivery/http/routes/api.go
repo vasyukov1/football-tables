@@ -6,7 +6,6 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/vasyukov1/football-tables/backend/internal/config"
 	"github.com/vasyukov1/football-tables/backend/internal/delivery/http/handler"
-	"github.com/vasyukov1/football-tables/backend/internal/delivery/http/middleware"
 	_ "github.com/vasyukov1/football-tables/docs"
 )
 
@@ -15,16 +14,18 @@ func SetupAPIRouter(
 	teamHandler *handler.TeamHandler,
 	cfg *config.Config,
 ) *gin.Engine {
-	router := gin.New()
+	router := gin.Default()
 
 	if cfg.Env == "development" {
 		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
-	router.Use(
-		middleware.CORS(cfg),
-		gin.Recovery(),
-	)
+	//router.Use(
+	//	middleware.CORS(cfg),
+	//	gin.Recovery(),
+	//)
+
+	router.Use(CORSMiddleware())
 
 	public := router.Group("")
 	{
@@ -43,4 +44,20 @@ func SetupAPIRouter(
 	//}
 
 	return router
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
 }
