@@ -14,6 +14,7 @@ func CORS(cfg *config.Config) gin.HandlerFunc {
 			"Content-Type, Content-Length, Accept-Encoding, Authorization, Accept, Origin, Cache-Control")
 		c.Writer.Header().Set("Access-Control-Allow-Methods",
 			"POST, OPTIONS, GET, PUT, PATCH, DELETE")
+		c.Writer.Header().Set("Access-Control-Max-Age", "86400")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)

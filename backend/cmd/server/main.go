@@ -6,46 +6,45 @@ import (
 	"github.com/vasyukov1/football-tables/backend/internal/config"
 	"github.com/vasyukov1/football-tables/backend/internal/delivery/http/handler"
 	"github.com/vasyukov1/football-tables/backend/internal/delivery/http/routes"
-	"github.com/vasyukov1/football-tables/backend/internal/infrastructure/repository/postgres_repo"
-	"github.com/vasyukov1/football-tables/backend/internal/infrastructure/repository/postgres_repo/model"
+	"github.com/vasyukov1/football-tables/backend/internal/infrastructure/repository"
 	"github.com/vasyukov1/football-tables/backend/internal/usecase"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"log"
+	"os"
 )
 
+// @title Football Tables API
+// @version 1.0
+// @description API for managing football tournaments
+// @host localhost:8080
+// @BasePath /
 func main() {
-	// Загрузка .env
 	if err := godotenv.Load(); err != nil {
-		log.Println("⚠️  .env not found, using environment variables")
+		log.Println(".env not found, using environment variables")
 	}
 
-	// Загрузка конфига
 	cfg := config.Load()
 
-	// Инициализация БД
 	db := initDB(cfg)
 
-	// Инициализация репозиториев
-	matchRepo := postgres_repo.NewMatchRepository(db)
+	matchRepo := repository.NewMatchRepository(db)
+	teamRepo := repository.NewTeamRepository(db)
 
-	// Инициализация usecase
-	matchUC := usecase.NewMatchUsecase(matchRepo)
+	matchUC := usecase.NewMatchUsecase(matchRepo, teamRepo)
+	teamUC := usecase.NewTeamUsecase(teamRepo)
 
-	// Middleware
-	//authMiddleware := middleware.NewAuthMiddleware(cfg.JWT.Secret)
-
-	// Handlers
 	matchHandler := handler.NewMatchHandler(matchUC)
+	teamHandler := handler.NewTeamHandler(teamUC)
 
-	// Роутер
 	router := routes.SetupAPIRouter(
 		matchHandler,
+		teamHandler,
 		cfg,
 	)
 
-	// Запуск сервера
-	log.Printf("🚀 Сервер запущен на порту %s", cfg.HTTP.Port)
+	log.Printf("Сервер запущен на порту %s", cfg.HTTP.Port)
 	_ = router.Run(":" + cfg.HTTP.Port)
 }
 
@@ -53,22 +52,21 @@ func initDB(cfg *config.Config) *gorm.DB {
 	dsn := buildDSN(cfg)
 	log.Println("DSN:", dsn)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			IgnoreRecordNotFoundError: true,
+			LogLevel:                  logger.Warn,
+		},
+	)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: newLogger,
+	})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	// Автомиграции (временное решение)
-	if err := db.AutoMigrate(
-		&model.Team{},
-		&model.Group{},
-		&model.Playoff{},
-		&model.Stage{},
-		&model.Match{},
-		&model.Table{},
-	); err != nil {
-		log.Fatalf("Migration failed: %v", err)
-	}
 	return db
 }
 

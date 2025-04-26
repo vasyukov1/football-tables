@@ -7,14 +7,6 @@ import (
 	"strings"
 )
 
-type AuthMiddleware struct {
-	jwtSecret string
-}
-
-func NewAuthMiddleware(jwtSecret string) *AuthMiddleware {
-	return &AuthMiddleware{jwtSecret: jwtSecret}
-}
-
 func JWT(secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
