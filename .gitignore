@@ -31,3 +31,39 @@ go.work.sum
 # env file
 .env
 
+# Стандартные исключения для React/TypeScript
+node_modules/
+.build/
+dist/
+coverage/
+.env.local
+.env.development
+.env.test
+.env.production
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.vscode/
+
+# Файлы сборки и кэши
+build/
+.cache/
+.tmp/
+*.tmp
+
+# Тесты и линтеры
+/junit.xml
+/coverage/
+.nyc_output/
+
+# Дополнительно для TypeScript
+*.js.map
+*.d.ts
+
+# Для Create React App
+/.pnp
+.pnp.js
+
+# Для npm/yarn
+package-lock.json
+yarn.lock

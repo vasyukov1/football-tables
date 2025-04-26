@@ -48,3 +48,10 @@ migrate -path ./backend/migrations -database 'postgres://football_user:football_
 ```bash
  swag init -g backend/cmd/server/main.go
 ```
+
+Запуск фронта:
+```bash
+cd ./ftontend
+npm install
+npm start
+```
