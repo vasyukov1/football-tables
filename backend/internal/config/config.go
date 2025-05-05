@@ -1,6 +1,11 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"log"
+
+	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
+)
 
 type Config struct {
 	DB struct {
@@ -30,6 +35,10 @@ func Load() *Config {
 	v.SetDefault("HTTP_PORT", "8080")
 	v.SetDefault("DB_PORT", "5432")
 	v.SetDefault("ENV", "development")
+
+	if err := godotenv.Load(); err != nil {
+		log.Println("⚠️  .env not found, using environment variables")
+	}
 
 	return &Config{
 		DB: struct {
@@ -64,4 +73,7 @@ func Load() *Config {
 		},
 		Env: v.GetString("ENV"),
 	}
+
+	
+	
 }

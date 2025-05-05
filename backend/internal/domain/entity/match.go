@@ -7,7 +7,9 @@ type Match struct {
 	Score1      int
 	Score2      int
 	Stage       string
-	GroupID     int
-	PlayoffID   int
+	GroupID     *int
+	PlayoffID   *int
 	IsCompleted bool
+
+    NextMatchID *int
 }

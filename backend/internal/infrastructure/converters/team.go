@@ -11,3 +11,11 @@ func ConvertToEntityTeam(t *model.Team) *entity.Team {
 		Name: t.Name,
 	}
 }
+
+
+func ConvertToModelTeam(e *entity.Team) *model.Team {
+    return &model.Team{
+        ID:   e.ID,   // ID можно оставить 0 для Create, либо передать существующий для Update
+        Name: e.Name,
+    }
+}
