@@ -1,0 +1,69 @@
+# If you prefer the allow list template instead of the deny list, see community template:
+# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
+#
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Go workspace file
+go.work
+go.work.sum
+
+# OS
+.DS_Store
+
+# Idea files
+.idea/
+**/.idea/
+
+# env file
+.env
+
+# Стандартные исключения для React/TypeScript
+node_modules/
+.build/
+dist/
+coverage/
+.env.local
+.env.development
+.env.test
+.env.production
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.vscode/
+
+# Файлы сборки и кэши
+build/
+.cache/
+.tmp/
+*.tmp
+
+# Тесты и линтеры
+/junit.xml
+/coverage/
+.nyc_output/
+
+# Дополнительно для TypeScript
+*.js.map
+*.d.ts
+
+# Для Create React App
+/.pnp
+.pnp.js
+
+# Для npm/yarn
+package-lock.json
+yarn.lock

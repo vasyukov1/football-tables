@@ -1,0 +1,6 @@
+BEGIN;
+
+DROP TABLE matches;
+DROP TABLE teams;
+
+COMMIT;
