@@ -1,8 +1,8 @@
 package entity
 
 type Group struct {
-    ID      int
-    Name    string
-    Teams   []*Team
-    Matches []*Match
+    ID      int       `json:"id"`
+    Name    string    `json:"name"`
+    Teams   []*Team   `json:"teams"`
+    Matches []*Match  `json:"matches"`
 }

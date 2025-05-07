@@ -1,6 +1,6 @@
 package entity
 
 type Playoff struct {
-    ID     int
-    Rounds []Stage
+    ID     int     `json:"id"`
+    Rounds []Stage `json:"rounds,omitempty"`
 }

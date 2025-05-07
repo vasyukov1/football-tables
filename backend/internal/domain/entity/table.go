@@ -1,6 +1,6 @@
 package entity
 
 type Table struct {
-    ID       int
-    GroupIDs []int
+    ID       int   `json:"id"`
+    GroupIDs []int `json:"groupIds"`
 }
