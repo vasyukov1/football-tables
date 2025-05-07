@@ -31,16 +31,20 @@ func main() {
 
 	matchRepo := repository.NewMatchRepository(db)
 	teamRepo := repository.NewTeamRepository(db)
+	groupRepo :=repository.NewGroupRepository(db)
 
 	matchUC := usecase.NewMatchUsecase(matchRepo, teamRepo)
 	teamUC := usecase.NewTeamUsecase(teamRepo)
+	groupUC := usecase.NewGroupUsecase(groupRepo, teamRepo)
 
 	matchHandler := handler.NewMatchHandler(matchUC)
 	teamHandler := handler.NewTeamHandler(teamUC)
+	groupHandler := handler.NewGroupHandler(groupUC)
 
 	router := routes.SetupAPIRouter(
 		matchHandler,
 		teamHandler,
+		groupHandler,
 		cfg,
 	)
 

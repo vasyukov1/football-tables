@@ -12,6 +12,7 @@ import (
 func SetupAPIRouter(
 	matchHandler *handler.MatchHandler,
 	teamHandler *handler.TeamHandler,
+	groupHandler *handler.GroupHandler,
 	cfg *config.Config,
 ) *gin.Engine {
 	router := gin.Default()
@@ -33,6 +34,8 @@ func SetupAPIRouter(
 		public.GET("/teams", teamHandler.GetTeams)
 		public.POST("/matches", matchHandler.CreateMatch)
 		public.GET("/matches", matchHandler.GetMatches)
+		public.GET("/groups", groupHandler.List)
+        public.POST("/groups", groupHandler.Create)
 	}
 
 	// It will be for admins
